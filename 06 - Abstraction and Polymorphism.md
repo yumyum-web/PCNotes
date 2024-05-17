@@ -83,9 +83,9 @@ public class Main {
 }
 ```
 
-## Dynamic Binding (Method Overloading)
+## Static Binding (Method Overloading)
 
-- Selection of the method to be executed is done at runtime, based on method name and arguments.
+- Selection of the method to be executed is done at compile-time, based on method signature.
 
 ```java
 public class Dog {
