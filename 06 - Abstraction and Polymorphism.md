@@ -50,23 +50,41 @@ public class ToDoList {
 # Polymorphism
 
 - Polymorphism is the ability of an object to take many forms.
-
-## Polymorphic objects
-
-- An object can be of multiple types.
 - A subclass object can be assigned to a superclass reference.
-- This is runtime polymorphism.
+
+## Binding
+
+### Static Binding (Method Overloading)
+
+- Defining multiple methods with the same name but different signatures is called method overloading.
+- Selection of the overload to be executed is done at **compile-time**, based on method signature and reference type.
+
+### Dynamic Binding (Method Overriding)
+
+- The reference type determines which methods can be called, but the concrete class determines which method
+  implementation is executed.
+- This is **runtime** polymorphism.
+
+### Example
 
 ```java
 public class Animal {
-    public void eat() {
-        System.out.println("Animal is eating");
+    public void eat(String food) {
+        eat(food, 1); // Cannot guarantee that Animal.eat(String, int) will be called, could be overridden.
+    }
+
+    public void eat(String food, int quantity) {
+        System.out.println("Animal is eating " + quantity + " " + food);
     }
 }
 
 public class Dog extends Animal {
     public void eat() {
-        System.out.println("Dog is eating");
+        eat("meat"); // Cannot guarantee that Animal.eat(String) will be called, could be overridden.
+    }
+
+    public void eat(String food, int quantity) { // Overrides Animal.eat(String, int)
+        System.out.println("Dog is eating " + quantity + " " + food);
     }
 
     public void bark() {
@@ -76,33 +94,14 @@ public class Dog extends Animal {
 
 public class Main {
     public static void main(String[] args) {
-        Animal animal = new Dog();
-        animal.eat(); // Dog is eating
-        animal.bark(); // Error: bark method is not defined in Animal class
-    }
-}
-```
+        Animal animal1 = new Animal();
+        animal1.eat("grass"); // Animal is eating 1 grass
 
-## Static Binding (Method Overloading)
-
-- Selection of the method to be executed is done at compile-time, based on method signature.
-
-```java
-public class Dog {
-    public void eat() {
-        System.out.println("Dog is eating");
-    }
-
-    public void eat(String food) {
-        System.out.println("Dog is eating " + food);
-    }
-}
-
-public class Main {
-    public static void main(String[] args) {
-        Dog dog = new Dog();
-        dog.eat(); // Dog is eating
-        dog.eat("meat"); // Dog is eating meat
+        Animal animal2 = new Dog();
+        animal2.eat(); // Dog is eating 1 meat
+        animal2.eat("pizza"); // Dog is eating 1 pizza
+        animal2.eat("lasagna", 2); // Dog is eating 2 lasagna
+        // animal.bark(); -> Compile-time error: bark() is not defined in Animal
     }
 }
 ```
@@ -122,27 +121,36 @@ public class Main {
 - This occurs at runtime.
 
 ```java
-public class Animal {
-    public void eat() {
-        System.out.println("Animal is eating");
-    }
-
-    public Animal getAnimal() {
-        return this;
-    }
+class Cloud {
 }
 
-public class Dog extends Animal {
+class Rock {
+}
 
-    public void bark() {
-        System.out.println("Woof! Woof!");
-    }
+final class Granite extends Rock { // final classes cannot be extended
+}
+
+interface Movable {
+    void move();
 }
 
 public class Main {
     public static void main(String[] args) {
-        Animal animal = new Dog().getAnimal();
-        ((Dog) animal).bark(); // Woof! Woof!
+        Rock rock1 = new Rock();
+        // rock1 is a Rock reference, Granite is a subclass of Rock
+        // Granite granite1 = (Granite) rock1; -> Runtime error: ClassCastException
+
+        Rock rock2 = new Rock();
+        // rock2 is a Rock reference, Cloud is not a subclass of Rock.
+        // Cloud cloud1 = (Cloud) rock2; -> Compilation error: incompatible types
+
+        Rock rock3 = new Granite();
+        // rock3 could be a subclass of Rock that implements Movable.
+        // Movable movable1 = (Movable) rock3; -> Runtime error: ClassCastException
+
+        Granite granite1 = new Granite();
+        // Granite is a final class, it cannot have subclasses that implement Movable.
+        // Movable movable2 = (Movable) granite1; -> Compilation error: incompatible types
     }
 }
 ```
